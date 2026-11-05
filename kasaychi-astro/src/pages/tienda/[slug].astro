@@ -1,0 +1,267 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductDetailActions from '../../components/store/ProductDetailActions.tsx';
+import { getAllProducts, getRelatedProducts } from '../../services/productService';
+import type { Product } from '../../types/store';
+import {
+  MapPin,
+  Mountain,
+  ThermometerSnowflake,
+  Clock,
+  CheckCircle2,
+  ArrowLeft,
+  Star,
+  ArrowRight,
+} from 'lucide-react';
+
+export async function getStaticPaths() {
+  const products = await getAllProducts();
+
+  return Promise.all(
+    products.map(async (product) => {
+      const relatedProducts = await getRelatedProducts(
+        product.id,
+        product.category,
+        3
+      );
+      return {
+        params: { slug: product.slug },
+        props: { product, relatedProducts },
+      };
+    })
+  );
+}
+
+interface Props {
+  product: Product;
+  relatedProducts: Product[];
+}
+
+const { product, relatedProducts } = Astro.props;
+
+const categoryLabel =
+  product.category === 'quesos'
+    ? 'Quesos Artesanales'
+    : product.category === 'lacteos'
+    ? 'Derivados Lácteos'
+    : 'Agricultura Andina';
+---
+
+<Layout
+  title={`${product.name} | Tienda Kasaychi`}
+  description={product.shortDescription}
+  image={product.images[0]}
+  type="product"
+>
+  <!-- Breadcrumbs -->
+  <section class="pt-28 pb-6 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-xs uppercase tracking-widest">
+        <a href="/" class="text-slate-400 hover:text-institutional-blue transition-colors">
+          Inicio
+        </a>
+        <span class="text-slate-300">/</span>
+        <a href="/tienda/" class="text-slate-400 hover:text-institutional-blue transition-colors">
+          Tienda
+        </a>
+        <span class="text-slate-300">/</span>
+        <span class="text-ancestral-gold font-bold">{categoryLabel}</span>
+        <span class="text-slate-300 hidden sm:inline">/</span>
+        <span class="text-institutional-blue font-bold hidden sm:inline truncate max-w-xs">
+          {product.name}
+        </span>
+      </nav>
+
+      <a
+        href="/tienda/"
+        class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-institutional-blue hover:text-ancestral-gold transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Volver al Catálogo
+      </a>
+    </div>
+  </section>
+
+  <!-- Sección Principal: Galería + Isla de Selección y Compra -->
+  <section class="py-12 md:py-16 bg-paper border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-8">
+      <ProductDetailActions client:load product={product} />
+    </div>
+  </section>
+
+  <!-- Ficha Técnica de Origen e Ingredientes -->
+  <section class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Especificaciones Técnicas -->
+        <div class="lg:col-span-7">
+          <span class="text-xs font-bold uppercase tracking-[0.3em] text-ancestral-gold block mb-3">
+            Trazabilidad y Origen
+          </span>
+          <h2 class="text-2xl md:text-3xl font-bold text-institutional-blue mb-8">
+            Ficha Técnica del Producto
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-paper border border-slate-200 p-5 flex items-start gap-4">
+              <div class="w-10 h-10 bg-institutional-blue text-ancestral-gold flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Origen Comunitario
+                </h3>
+                <p class="text-sm font-bold text-institutional-blue">
+                  {product.specs.origin}
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-paper border border-slate-200 p-5 flex items-start gap-4">
+              <div class="w-10 h-10 bg-institutional-blue text-ancestral-gold flex items-center justify-center flex-shrink-0">
+                <Mountain className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Altitud de Producción
+                </h3>
+                <p class="text-sm font-bold text-institutional-blue">
+                  {product.specs.altitude}
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-paper border border-slate-200 p-5 flex items-start gap-4">
+              <div class="w-10 h-10 bg-institutional-blue text-ancestral-gold flex items-center justify-center flex-shrink-0">
+                <ThermometerSnowflake className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Conservación Recomendada
+                </h3>
+                <p class="text-sm font-bold text-institutional-blue">
+                  {product.specs.conservation}
+                </p>
+              </div>
+            </div>
+
+            {product.specs.maturation && (
+              <div class="bg-paper border border-slate-200 p-5 flex items-start gap-4">
+                <div class="w-10 h-10 bg-institutional-blue text-ancestral-gold flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    Proceso / Maduración
+                  </h3>
+                  <p class="text-sm font-bold text-institutional-blue">
+                    {product.specs.maturation}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Ingredientes y Composición -->
+        <div class="lg:col-span-5 bg-institutional-blue text-white p-8 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-[0.3em] text-ancestral-gold block mb-3">
+              Pureza Garantizada
+            </span>
+            <h3 class="text-2xl font-bold mb-6">
+              Ingredientes y Composición
+            </h3>
+            <ul class="space-y-3 mb-8">
+              {product.specs.ingredients.map((ingredient) => (
+                <li class="flex items-start gap-3 text-sm font-serif">
+                  <CheckCircle2 className="w-5 h-5 text-ancestral-gold flex-shrink-0 mt-0.5" />
+                  <span>{ingredient}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="pt-6 border-t border-white/15 flex items-center justify-between">
+            <div>
+              <span class="block text-[10px] uppercase tracking-widest text-ancestral-gold font-bold">
+                Valoración Comunitaria
+              </span>
+              <div class="flex items-center gap-2 mt-1">
+                <Star className="w-4 h-4 text-ancestral-gold fill-current" />
+                <span class="font-bold text-lg">{product.rating.toFixed(1)} / 5.0</span>
+                <span class="text-xs text-white/70">
+                  ({product.reviewsCount} reseñas verificadas)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Productos Relacionados -->
+  {relatedProducts.length > 0 && (
+    <section class="py-16 md:py-20 bg-paper">
+      <div class="max-w-7xl mx-auto px-8">
+        <div class="flex items-end justify-between mb-10 pb-4 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-[0.3em] text-ancestral-gold block mb-2">
+              Sigue Explorando
+            </span>
+            <h2 class="text-3xl font-bold text-institutional-blue">
+              Productos Relacionados
+            </h2>
+          </div>
+          <a
+            href="/tienda/"
+            class="text-xs font-bold uppercase tracking-widest text-institutional-blue hover:text-ancestral-gold inline-flex items-center gap-2"
+          >
+            Ver Todo el Catálogo
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {relatedProducts.map((rel) => (
+            <a
+              href={`/tienda/${rel.slug}/`}
+              class="group bg-white border border-slate-200 hover:border-ancestral-gold/60 transition-all duration-300 flex flex-col overflow-hidden shadow-xs hover:shadow-lg"
+            >
+              <div class="aspect-[16/10] bg-slate-100 overflow-hidden">
+                <img
+                  src={rel.images[0]}
+                  alt={rel.name}
+                  loading="lazy"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div class="p-6 flex flex-col flex-1">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-ancestral-gold mb-1">
+                  {rel.subtitle}
+                </span>
+                <h3 class="text-lg font-bold text-institutional-blue group-hover:text-ancestral-gold transition-colors mb-2">
+                  {rel.name}
+                </h3>
+                <p class="text-xs text-slate-600 font-serif line-clamp-2 mb-4 flex-1">
+                  {rel.shortDescription}
+                </p>
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <span class="text-lg font-bold text-institutional-blue">
+                    Desde ${rel.price.toFixed(2)} USD
+                  </span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-ancestral-gold inline-flex items-center gap-1">
+                    Ver Producto
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>
+

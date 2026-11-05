@@ -1,0 +1,119 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import FadeIn from '../../components/ui/FadeIn.tsx';
+import ProductCatalog from '../../components/store/ProductCatalog.tsx';
+import { getAllProducts } from '../../services/productService';
+import { Award, ShieldCheck, Truck, HeartHandshake } from 'lucide-react';
+
+// En tiempo de compilación obtiene los productos desde la capa de servicios (actualmente Mock Temporal -> futuro Supabase)
+const products = await getAllProducts();
+
+const guarantees = [
+  {
+    icon: Award,
+    title: 'Tradición de 70+ Años',
+    description: 'Recetas ancestrales de la familia y comunidad Inti Churi en Guaranda.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Comercio Justo Directo',
+    description: 'El 100% de tu compra beneficia directamente a las 6 comunidades de Kasaychi.',
+  },
+  {
+    icon: Truck,
+    title: 'Cadena de Frío Segura',
+    description: 'Empaque al vacío y despacho refrigerado o retiro directo en nuestra planta.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Pago por Transferencia',
+    description: 'Proceso transparente: transfiere sin recargos y sube tu comprobante en el Checkout.',
+  },
+];
+---
+
+<Layout
+  title="Tienda Comunitaria | Quesos y Productos Andinos"
+  description="Tienda digital oficial de la Comunidad Kasaychi - Inti Churi. Compra quesos artesanales, mozzarella, curado, yogurt natural y productos agrícolas de los Andes ecuatorianos."
+  image="/images/queso_premium_v2.png"
+>
+  <!-- Hero Section de la Tienda -->
+  <section class="relative pt-32 pb-20 overflow-hidden bg-institutional-blue">
+    <div class="absolute inset-0 opacity-25">
+      <img
+        src="/images/queso_premium_v2.png"
+        alt="Quesos Artesanales Inti Churi - Comunidad Kasaychi"
+        class="w-full h-full object-cover"
+      />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-r from-institutional-blue via-institutional-blue/90 to-institutional-blue/75"></div>
+    <div class="absolute inset-0 chacana-bg opacity-5 pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-8">
+      <FadeIn client:load>
+        <div class="max-w-3xl">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="h-[1px] w-12 bg-ancestral-gold"></span>
+            <span class="text-xs font-bold uppercase tracking-[0.3em] text-ancestral-gold">
+              Comercio Justo · Inti Churi
+            </span>
+          </div>
+
+          <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Tienda Digital <span class="text-ancestral-gold">Kasaychi</span>
+          </h1>
+
+          <p class="text-lg md:text-xl text-white/90 font-serif leading-relaxed mb-8">
+            Del páramo andino a tu mesa. Adquiere nuestros quesos artesanales madurados a 3.200 m.s.n.m., derivados lácteos 100% naturales y cosechas agroecológicas cultivadas por nuestras familias.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-widest text-white">
+            <a
+              href="#catalogo-productos"
+              class="bg-ancestral-gold text-white px-8 py-4 hover:bg-white hover:text-institutional-blue transition-colors"
+            >
+              Explorar Catálogo
+            </a>
+            <a
+              href="/checkout/"
+              class="border border-white/30 bg-white/10 px-8 py-4 hover:bg-white/20 transition-colors"
+            >
+              Ir al Checkout
+            </a>
+          </div>
+        </div>
+      </FadeIn>
+    </div>
+  </section>
+
+  <!-- Franja de Garantías Comunitarias -->
+  <section class="bg-white border-b border-slate-200 py-10">
+    <div class="max-w-7xl mx-auto px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {guarantees.map((item) => (
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 bg-ancestral-gold/15 border border-ancestral-gold/30 flex items-center justify-center flex-shrink-0">
+              <item.icon className="w-5 h-5 text-ancestral-gold" />
+            </div>
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-institutional-blue mb-1">
+                {item.title}
+              </h2>
+              <p class="text-xs text-slate-600 font-serif leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Catálogo Interactivo con Filtros (Isla de React) -->
+  <section id="catalogo-productos" class="py-16 md:py-24 bg-paper">
+    <div class="max-w-7xl mx-auto px-8">
+      <ProductCatalog client:load initialProducts={products} />
+    </div>
+  </section>
+</Layout>
+

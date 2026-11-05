@@ -7,18 +7,21 @@ import { Award, Leaf, HandMetal, Clock, Medal, Star, ExternalLink, ArrowRight, T
 const products = [
   {
     name: 'Mozzarella Artesanal',
+    slug: 'queso-mozzarella-artesanal',
     description: 'Suave y cremoso, perfecto para pizzas y ensaladas. Elaborado diariamente con leche fresca.',
     image: '/images/queso_mozarella.png',
     rating: 5,
   },
   {
     name: 'Orégano & Ají',
+    slug: 'queso-oregano-y-aji',
     description: 'Una explosión de sabores que combina la cremosidad del queso con el aroma del orégano y el toque picante del ají.',
     image: '/images/queso_oregano.png',
     rating: 4.5,
   },
   {
     name: 'Curado Especial',
+    slug: 'queso-curado-especial',
     description: 'Nuestro queso de maduración prolongada con sabor intenso y textura firme. Ideal para los paladares más exigentes.',
     image: '/images/queso_curado.png',
     rating: 5,
@@ -74,18 +77,15 @@ const stats = [
               y la pasión de generaciones. Más de 70 años de experiencia en cada pieza.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 mb-12">
-              <a href="#productos" class="inline-flex items-center justify-center gap-2 bg-ancestral-gold text-white px-8 py-4 font-bold uppercase text-xs tracking-[0.2em] hover:bg-ancestral-gold/90 transition-colors">
-                Ver Productos
+              <a href="/tienda/" class="inline-flex items-center justify-center gap-2 bg-ancestral-gold text-white px-8 py-4 font-bold uppercase text-xs tracking-[0.2em] hover:bg-ancestral-gold/90 transition-colors">
+                Ir a la Tienda Digital
                 <ArrowRight className="w-5 h-5" />
               </a>
               <a 
-                href="https://docs.google.com/forms/d/e/1FAIpQLSfdKlGXTKcVvKPovsqa4NjN7CDTcL3lrmcvi9CW0_g1bTN2aQ/viewform?usp=dialog" 
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#productos" 
                 class="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white px-8 py-4 font-bold uppercase text-xs tracking-[0.2em] hover:bg-white/10 transition-colors"
               >
-                Comprar Ahora
-                <ExternalLink className="w-5 h-5" />
+                Conocer Variedades
               </a>
             </div>
             
@@ -172,12 +172,10 @@ const stats = [
               ))}
             </ul>
             <a 
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfdKlGXTKcVvKPovsqa4NjN7CDTcL3lrmcvi9CW0_g1bTN2aQ/viewform?usp=dialog" 
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/tienda/queso-inti-churi-premium/" 
               class="inline-flex items-center justify-center gap-2 bg-ancestral-gold text-white px-8 py-4 font-bold uppercase text-xs tracking-[0.2em] hover:bg-ancestral-gold/90 transition-colors"
             >
-              Hacer Pedido
+              Ver Producto y Comprar
               <ArrowRight className="w-5 h-5" />
             </a>
           </FadeIn>
@@ -223,12 +221,10 @@ const stats = [
                 <h3 class="text-xl text-white font-bold mb-3">{product.name}</h3>
                 <p class="text-white text-sm leading-relaxed mb-6 font-serif flex-grow">{product.description}</p>
                 <a 
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSfdKlGXTKcVvKPovsqa4NjN7CDTcL3lrmcvi9CW0_g1bTN2aQ/viewform?usp=dialog" 
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/tienda/${product.slug}/`} 
                   class="inline-flex items-center justify-center gap-2 bg-ancestral-gold text-white px-6 py-3 font-bold uppercase text-xs tracking-[0.2em] hover:bg-ancestral-gold/90 transition-colors mt-auto"
                 >
-                  Hacer Pedido
+                  Ver Detalle y Comprar
                 </a>
               </div>
             </div>
@@ -332,13 +328,11 @@ const stats = [
               Haz tu pedido hoy y disfruta de los mejores quesos artesanales de los Andes ecuatorianos.
             </p>
             <a 
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfdKlGXTKcVvKPovsqa4NjN7CDTcL3lrmcvi9CW0_g1bTN2aQ/viewform?usp=dialog" 
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/tienda/" 
               class="inline-flex items-center justify-center gap-2 bg-white text-institutional-blue px-8 py-4 font-bold uppercase text-xs tracking-[0.2em] hover:bg-paper transition-colors"
             >
-              Comprar Ahora
-              <ExternalLink className="w-5 h-5" />
+              Comprar en la Tienda Digital
+              <ArrowRight className="w-5 h-5" />
             </a>
           </div>
         </div>

@@ -1,11 +1,13 @@
 ---
 import { Menu, X } from 'lucide-react';
+import CartDrawer from './store/CartDrawer.tsx';
 const navItems = [
   { label: 'Inicio', href: '/' },
   { label: 'Nosotros', href: '/quienes-somos/' },
   { label: 'Historia', href: '/quienes-somos/historia/' },
   { label: 'Actividades', href: '/actividades/sociales/' },
-  { label: 'Productos', href: '/queso/' },
+  { label: 'Quesería', href: '/queso/' },
+  { label: 'Tienda', href: '/tienda/' },
   { label: 'Proyectos', href: '/proyectos/' },
 ];
 const currentPath = Astro.url.pathname;
@@ -25,7 +27,7 @@ const currentPath = Astro.url.pathname;
     </a>
     
     <!-- Desktop nav -->
-    <div class="hidden lg:flex items-center gap-10">
+    <div class="hidden lg:flex items-center gap-7">
       {navItems.map((item) => (
         <a 
           href={item.href} 
@@ -41,23 +43,28 @@ const currentPath = Astro.url.pathname;
       ))}
       <a 
         href="/compromiso/" 
-        class="bg-institutional-blue text-white px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all"
+        class="bg-institutional-blue text-white px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all"
       >
         Compromiso
       </a>
     </div>
     
-    <!-- Mobile menu button -->
-    <button 
-      id="mobile-menu-btn" 
-      class="lg:hidden p-2 text-institutional-blue"
-      aria-label="Abrir menú de navegación"
-      aria-expanded="false"
-      aria-controls="mobile-menu"
-    >
-      <Menu className="w-6 h-6" id="menu-icon-open" />
-      <X className="w-6 h-6 hidden" id="menu-icon-close" />
-    </button>
+    <!-- Acciones Derecha: Carrito Global + Botón Menú Móvil -->
+    <div class="flex items-center gap-3">
+      <CartDrawer client:load />
+
+      <!-- Mobile menu button -->
+      <button 
+        id="mobile-menu-btn" 
+        class="lg:hidden p-2 text-institutional-blue"
+        aria-label="Abrir menú de navegación"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <Menu className="w-6 h-6" id="menu-icon-open" />
+        <X className="w-6 h-6 hidden" id="menu-icon-close" />
+      </button>
+    </div>
   </nav>
   
   <!-- Mobile menu -->
