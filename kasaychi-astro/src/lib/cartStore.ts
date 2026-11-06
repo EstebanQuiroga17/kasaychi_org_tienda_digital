@@ -53,7 +53,7 @@ export function addToCart(
   if (existingIndex > -1) {
     updatedItems = currentItems.map((item, idx) => {
       if (idx !== existingIndex) return item;
-      const nextQty = Math.min(item.quantity + quantity, selectedVariant.stock);
+      const nextQty = item.quantity + quantity;
       return { ...item, quantity: nextQty };
     });
   } else {
@@ -67,8 +67,8 @@ export function addToCart(
       variantId: selectedVariant.id,
       variantLabel: selectedVariant.label,
       unitPrice: selectedVariant.price,
-      quantity: Math.min(quantity, selectedVariant.stock),
-      maxStock: selectedVariant.stock,
+      quantity: quantity,
+      maxStock: 999,
     };
     updatedItems = [...currentItems, newItem];
   }
@@ -92,7 +92,7 @@ export function updateCartItemQuantity(cartItemId: string, quantity: number): Ca
     if (item.cartItemId !== cartItemId) return item;
     return {
       ...item,
-      quantity: Math.min(quantity, item.maxStock),
+      quantity: quantity,
     };
   });
 

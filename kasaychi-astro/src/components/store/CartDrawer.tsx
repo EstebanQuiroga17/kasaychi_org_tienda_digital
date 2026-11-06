@@ -87,14 +87,14 @@ export default function CartDrawer() {
             />
 
             {/* Panel lateral */}
-            <div className="relative z-10 w-full max-w-md bg-paper h-full shadow-2xl flex flex-col border-l border-slate-200">
+            <div className="relative z-10 w-full max-w-lg sm:max-w-xl bg-paper h-full shadow-2xl flex flex-col border-l border-slate-200">
               {/* Borde superior Wiphala */}
               <div className="wiphala-border w-full flex-shrink-0" />
 
               {/* Cabecera del Carrito */}
               <div className="px-6 py-5 bg-white border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-institutional-blue text-white flex items-center justify-center">
+                  <div className="w-10 h-10 bg-institutional-blue text-white flex items-center justify-center shadow-xs">
                     <ShoppingBag className="w-5 h-5 text-ancestral-gold" />
                   </div>
                   <div>
@@ -114,7 +114,7 @@ export default function CartDrawer() {
                   type="button"
                   onClick={closeDrawer}
                   aria-label="Cerrar carrito"
-                  className="p-2 text-slate-400 hover:text-institutional-blue transition-colors cursor-pointer"
+                  className="p-2 text-slate-400 hover:text-institutional-blue transition-colors cursor-pointer rounded-xs hover:bg-slate-100"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -140,8 +140,8 @@ export default function CartDrawer() {
                 </div>
               )}
 
-              {/* Lista de Productos */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Lista de Productos estilo Visual Marketplace */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
                 {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center py-12">
                     <div className="w-16 h-16 border border-ancestral-gold/40 bg-white flex items-center justify-center mb-6">
@@ -166,57 +166,62 @@ export default function CartDrawer() {
                   items.map((item) => (
                     <div
                       key={item.cartItemId}
-                      className="bg-white border border-slate-200 p-4 flex gap-4 hover:border-ancestral-gold/50 transition-colors"
+                      className="bg-white border border-slate-200 p-4 flex flex-col sm:flex-row gap-4 hover:border-ancestral-gold/70 transition-all rounded-xs shadow-xs group"
                     >
+                      {/* Imagen visual protagonista estilo Marketplace (120px+ en desktop, aspect-square) */}
                       <a
                         href={`/tienda/${item.slug}/`}
                         onClick={closeDrawer}
-                        className="w-20 h-20 bg-slate-100 flex-shrink-0 overflow-hidden block"
+                        className="w-full sm:w-28 sm:h-28 md:w-32 md:h-32 aspect-square bg-slate-50 border border-slate-100 flex-shrink-0 overflow-hidden block relative rounded-xs"
                       >
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </a>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <a
-                            href={`/tienda/${item.slug}/`}
-                            onClick={closeDrawer}
-                            className="text-sm font-bold text-institutional-blue hover:text-ancestral-gold transition-colors truncate block"
-                          >
-                            {item.name}
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() => removeItem(item.cartItemId)}
-                            aria-label={`Eliminar ${item.name}`}
-                            className="text-slate-400 hover:text-red-600 transition-colors p-0.5 cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                      {/* Información y acciones */}
+                      <div className="flex-1 flex flex-col justify-between min-w-0">
+                        <div>
+                          <div className="flex items-start justify-between gap-2">
+                            <a
+                              href={`/tienda/${item.slug}/`}
+                              onClick={closeDrawer}
+                              className="text-sm sm:text-base font-bold text-institutional-blue hover:text-ancestral-gold transition-colors leading-snug line-clamp-2 block"
+                            >
+                              {item.name}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(item.cartItemId)}
+                              aria-label={`Eliminar ${item.name}`}
+                              className="text-slate-400 hover:text-red-600 transition-colors p-1.5 cursor-pointer rounded-xs hover:bg-red-50 flex-shrink-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <span className="inline-block text-[11px] font-semibold text-ancestral-gold bg-amber-50 border border-amber-200/60 px-2.5 py-0.5 mt-1.5">
+                            {item.variantLabel}
+                          </span>
                         </div>
 
-                        <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-ancestral-gold bg-ancestral-gold/10 px-2 py-0.5 mt-1 mb-2">
-                          {item.variantLabel}
-                        </span>
-
-                        <div className="flex items-center justify-between mt-2">
-                          {/* Selector de Cantidad */}
-                          <div className="inline-flex items-center border border-slate-200 bg-paper">
+                        {/* Fila de Controles y Precio destacado */}
+                        <div className="flex items-end justify-between mt-3 pt-3 border-t border-slate-100">
+                          {/* Selector de Cantidad táctil y accesible */}
+                          <div className="inline-flex items-center border border-slate-300 bg-paper">
                             <button
                               type="button"
                               onClick={() =>
                                 updateQuantity(item.cartItemId, item.quantity - 1)
                               }
                               aria-label="Disminuir cantidad"
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
                             >
-                              <Minus className="w-3 h-3" />
+                              <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="w-8 text-center text-xs font-bold text-institutional-blue">
+                            <span className="w-9 text-center text-sm font-bold text-institutional-blue">
                               {item.quantity}
                             </span>
                             <button
@@ -224,20 +229,19 @@ export default function CartDrawer() {
                               onClick={() =>
                                 updateQuantity(item.cartItemId, item.quantity + 1)
                               }
-                              disabled={item.quantity >= item.maxStock}
                               aria-label="Aumentar cantidad"
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-40 transition-colors cursor-pointer"
+                              className="w-8 h-8 flex items-center justify-center text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
                             >
-                              <Plus className="w-3 h-3" />
+                              <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
 
-                          {/* Subtotal de línea */}
+                          {/* Subtotal de línea y unitario */}
                           <div className="text-right">
-                            <p className="text-sm font-bold text-institutional-blue">
+                            <p className="text-base sm:text-lg font-black text-institutional-blue tracking-tight">
                               ${(item.unitPrice * item.quantity).toFixed(2)}
                             </p>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[11px] text-slate-500 font-medium">
                               ${item.unitPrice.toFixed(2)} c/u
                             </p>
                           </div>

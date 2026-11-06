@@ -34,10 +34,6 @@ export default function ProductDetailActions({
 
   const handleVariantChange = (variantId: string) => {
     setSelectedVariantId(variantId);
-    const nextVariant = product.variants.find((v) => v.id === variantId);
-    if (nextVariant && quantity > nextVariant.stock) {
-      setQuantity(Math.max(1, nextVariant.stock));
-    }
   };
 
   const handleAddToCart = () => {
@@ -135,13 +131,6 @@ export default function ProductDetailActions({
               </span>
             </div>
           </div>
-
-          <div className="text-right">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              Disponible ({activeVariant.stock} uds.)
-            </span>
-          </div>
         </div>
 
         {/* Selector de Presentación / Variante */}
@@ -163,18 +152,9 @@ export default function ProductDetailActions({
                       : 'border-slate-200 bg-paper text-slate-800 hover:border-ancestral-gold'
                   }`}
                 >
-                  <div>
-                    <span className="block text-xs font-bold">
-                      {variant.label}
-                    </span>
-                    <span
-                      className={`text-[11px] ${
-                        isSelected ? 'text-ancestral-gold' : 'text-slate-500'
-                      }`}
-                    >
-                      Stock: {variant.stock} uds.
-                    </span>
-                  </div>
+                  <span className="block text-sm font-bold">
+                    {variant.label}
+                  </span>
                   <span className="text-sm font-bold">
                     ${variant.price.toFixed(2)}
                   </span>
@@ -204,12 +184,9 @@ export default function ProductDetailActions({
               </span>
               <button
                 type="button"
-                onClick={() =>
-                  setQuantity((q) => Math.min(activeVariant.stock, q + 1))
-                }
-                disabled={quantity >= activeVariant.stock}
+                onClick={() => setQuantity((q) => q + 1)}
                 aria-label="Aumentar cantidad"
-                className="w-11 h-11 flex items-center justify-center text-institutional-blue hover:bg-slate-200 disabled:opacity-40 transition-colors cursor-pointer"
+                className="w-11 h-11 flex items-center justify-center text-institutional-blue hover:bg-slate-200 transition-colors cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
               </button>

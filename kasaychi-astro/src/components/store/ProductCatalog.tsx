@@ -8,6 +8,7 @@ import {
   Eye,
   RotateCcw,
   Sparkles,
+  X,
 } from 'lucide-react';
 import type { Product, ProductCategory } from '../../types/store';
 import { PRODUCT_CATEGORIES } from '../../data/products';
@@ -31,6 +32,8 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   // Feedback temporal al agregar un producto
   const [justAddedMap, setJustAddedMap] = useState<Record<string, boolean>>({});
+  // Modal para que el cliente elija la variante al momento de agregar
+  const [variantModalProduct, setVariantModalProduct] = useState<Product | null>(null);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: initialProducts.length };
@@ -101,12 +104,24 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
   };
 
   const handleAddToCart = (product: Product) => {
-    const activeVariantId = selectedVariants[product.id];
-    const variant =
-      product.variants.find((v) => v.id === activeVariantId) ?? product.variants[0];
+    if (product.variants.length > 1) {
+      setVariantModalProduct(product);
+    } else {
+      const variant = product.variants[0];
+      addItem(product, variant, 1, true);
+      setJustAddedMap((prev) => ({ ...prev, [product.id]: true }));
+      setTimeout(() => {
+        setJustAddedMap((prev) => ({ ...prev, [product.id]: false }));
+      }, 1800);
+    }
+  };
 
+  const handleSelectVariantAndAdd = (
+    product: Product,
+    variant: Product['variants'][0]
+  ) => {
     addItem(product, variant, 1, true);
-
+    setVariantModalProduct(null);
     setJustAddedMap((prev) => ({ ...prev, [product.id]: true }));
     setTimeout(() => {
       setJustAddedMap((prev) => ({ ...prev, [product.id]: false }));
@@ -257,152 +272,157 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map((product) => {
-            const activeVariantId =
-              selectedVariants[product.id] ?? product.variants[0]?.id;
-            const activeVariant =
-              product.variants.find((v) => v.id === activeVariantId) ??
-              product.variants[0];
             const isJustAdded = Boolean(justAddedMap[product.id]);
+            const basePrice = product.variants[0]?.price ?? product.price;
 
             return (
               <article
                 key={product.id}
-                className="bg-white border border-slate-200 hover:border-ancestral-gold/60 transition-all duration-300 flex flex-col group shadow-xs hover:shadow-xl"
+                className="bg-white border border-slate-200 hover:border-ancestral-gold/70 transition-all duration-300 flex flex-col group shadow-xs hover:shadow-xl rounded-xs overflow-hidden"
               >
-                {/* Imagen y Badges */}
-                <div className="relative aspect-[16/11] bg-slate-100 overflow-hidden">
-                  <a href={`/tienda/${product.slug}/`} className="block w-full h-full">
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  </a>
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 pointer-events-none">
-                    {product.badges.slice(0, 2).map((badge) => (
-                      <span
-                        key={badge}
-                        className="px-2.5 py-1 bg-institutional-blue/95 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm"
-                      >
-                        {badge}
+                {/* Fotografía Protagonista del Producto (Estilo Marketplace) */}
+                <a
+                  href={`/tienda/${product.slug}/`}
+                  className="relative aspect-square sm:aspect-[4/3] bg-slate-50 overflow-hidden block"
+                >
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </a>
+
+                {/* Contenido Limpio: Simplemente Título y Precio */}
+                <div className="p-5 flex flex-col flex-1 justify-between gap-4">
+                  <div>
+                    <a
+                      href={`/tienda/${product.slug}/`}
+                      className="block group-hover:text-ancestral-gold transition-colors"
+                    >
+                      <h3 className="text-base sm:text-lg font-bold text-institutional-blue leading-snug line-clamp-2">
+                        {product.name}
+                      </h3>
+                    </a>
+
+                    <div className="mt-2.5 flex items-baseline gap-1.5">
+                      <span className="text-2xl font-black text-institutional-blue">
+                        ${basePrice.toFixed(2)}
                       </span>
-                    ))}
-                  </div>
-                  <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-2.5 py-1 border border-slate-200 flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 text-ancestral-gold fill-current" />
-                    <span className="text-xs font-bold text-institutional-blue">
-                      {product.rating.toFixed(1)}
-                    </span>
-                    <span className="text-[10px] text-slate-500">
-                      ({product.reviewsCount})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Contenido de la Tarjeta */}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ancestral-gold">
-                      {product.category === 'quesos'
-                        ? 'Quesería Artesanal'
-                        : product.category === 'lacteos'
-                        ? 'Derivados Lácteos'
-                        : 'Agricultura Andina'}
-                    </span>
-                    <span className="text-[11px] text-emerald-700 font-semibold">
-                      En Stock ({activeVariant.stock} disp.)
-                    </span>
-                  </div>
-
-                  <a
-                    href={`/tienda/${product.slug}/`}
-                    className="block group-hover:text-ancestral-gold transition-colors"
-                  >
-                    <h3 className="text-xl font-bold text-institutional-blue mb-2 leading-snug">
-                      {product.name}
-                    </h3>
-                  </a>
-
-                  <p className="text-sm text-slate-600 font-serif mb-5 line-clamp-2 flex-grow">
-                    {product.shortDescription}
-                  </p>
-
-                  {/* Selector Rápido de Presentación / Variante */}
-                  <div className="mb-5">
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                      Presentación:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.variants.map((variant) => {
-                        const isSelected = variant.id === activeVariant.id;
-                        return (
-                          <button
-                            key={variant.id}
-                            type="button"
-                            onClick={() =>
-                              handleSelectVariant(product.id, variant.id)
-                            }
-                            className={`px-2.5 py-1 text-[11px] font-semibold border transition-colors cursor-pointer ${
-                              isSelected
-                                ? 'bg-institutional-blue text-white border-institutional-blue'
-                                : 'bg-paper text-slate-700 border-slate-200 hover:border-ancestral-gold'
-                            }`}
-                          >
-                            {variant.label}
-                          </button>
-                        );
-                      })}
+                      <span className="text-xs text-slate-500 font-medium">
+                        USD {product.variants.length > 1 ? '(desde)' : ''}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Precio y Acciones */}
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4 mt-auto">
-                    <div>
-                      <span className="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                        Precio
-                      </span>
-                      <span className="text-2xl font-bold text-institutional-blue">
-                        ${activeVariant.price.toFixed(2)}
-                      </span>
-                      <span className="text-xs text-slate-500 ml-1">USD</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`/tienda/${product.slug}/`}
-                        title="Ver ficha completa del producto"
-                        className="p-3 border border-slate-200 text-institutional-blue hover:border-ancestral-gold hover:text-ancestral-gold transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => handleAddToCart(product)}
-                        className={`px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 cursor-pointer ${
-                          isJustAdded
-                            ? 'bg-emerald-700 text-white'
-                            : 'bg-ancestral-gold text-white hover:bg-institutional-blue'
-                        }`}
-                      >
-                        {isJustAdded ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Agregado
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingBag className="w-4 h-4" />
-                            Agregar
-                          </>
-                        )}
-                      </button>
-                    </div>
+                  {/* Acciones */}
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <a
+                      href={`/tienda/${product.slug}/`}
+                      title="Ver ficha completa del producto"
+                      className="p-3 border border-slate-200 text-institutional-blue hover:border-ancestral-gold hover:text-ancestral-gold transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(product)}
+                      className={`flex-1 py-3 px-4 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        isJustAdded
+                          ? 'bg-emerald-700 text-white'
+                          : 'bg-ancestral-gold text-white hover:bg-institutional-blue'
+                      }`}
+                    >
+                      {isJustAdded ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Agregado
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingBag className="w-4 h-4" />
+                          {product.variants.length > 1 ? 'Elegir y Agregar' : 'Agregar'}
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </article>
             );
           })}
+        </div>
+      )}
+
+      {/* Modal: El cliente escoge la variante a la hora de agregar */}
+      {variantModalProduct && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-institutional-blue/60 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setVariantModalProduct(null)}
+        >
+          <div
+            className="bg-white border border-slate-200 shadow-2xl max-w-md w-full p-6 relative rounded-xs animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <img
+                  src={variantModalProduct.images[0]}
+                  alt={variantModalProduct.name}
+                  className="w-14 h-14 object-cover border border-slate-200"
+                />
+                <div>
+                  <h4 className="text-sm font-bold text-institutional-blue leading-snug line-clamp-1">
+                    {variantModalProduct.name}
+                  </h4>
+                  <p className="text-xs text-slate-500 font-serif">
+                    Elige la presentación a agregar:
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setVariantModalProduct(null)}
+                aria-label="Cerrar modal"
+                className="text-slate-400 hover:text-institutional-blue p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="py-4 space-y-2.5">
+              {variantModalProduct.variants.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() =>
+                    handleSelectVariantAndAdd(variantModalProduct, v)
+                  }
+                  className="w-full p-3.5 border border-slate-200 hover:border-ancestral-gold hover:bg-amber-50/50 flex items-center justify-between transition-all cursor-pointer group"
+                >
+                  <span className="font-bold text-sm text-institutional-blue group-hover:text-ancestral-gold">
+                    {v.label}
+                  </span>
+                  <div className="text-right">
+                    <span className="text-base font-black text-institutional-blue">
+                      ${v.price.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] text-slate-400 ml-1">USD</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 text-center">
+              <a
+                href={`/tienda/${variantModalProduct.slug}/`}
+                className="text-xs font-bold uppercase tracking-widest text-ancestral-gold hover:text-institutional-blue transition-colors"
+              >
+                Ver ficha completa del producto →
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </div>
